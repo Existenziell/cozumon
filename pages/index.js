@@ -64,7 +64,7 @@ const Cozumon = ({ initialData }) => {
       </Head>
 
       <main className="flex flex-col items-center px-8 w-screen">
-        <h1 className="text-4xl mt-4 mb-8">Cozumel Taxonomy</h1>
+        <h1 className="text-4xl mt-4 mb-8 text-brand">Cozumel Taxonomy</h1>
 
         <div className="flex flex-col items-center w-full pb-16">
           <h2 className="my-6 bg-gray-50 shadow p-6 text-center max-w-md">
