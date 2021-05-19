@@ -85,7 +85,7 @@ const Cozumon = ({ initialData }) => {
   }
 
   return (
-    <div>
+    <>
       <Head>
         <title>Cozumon</title>
         <meta name="description" content="Cozumon | Cozumel Taxonomy" />
@@ -153,7 +153,7 @@ const Cozumon = ({ initialData }) => {
         </div>
 
       </main>
-    </div >
+    </>
   )
 }
 
