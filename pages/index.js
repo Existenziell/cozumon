@@ -110,6 +110,13 @@ const Cozumon = ({ initialData }) => {
     }
   }
 
+  const capitalize = (string) => {
+    const cap = (str) => {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    return string.split(' ').map(cap).join(' ');
+  }
+
   const scrollToTop = (e) => {
     e.preventDefault()
     window.scroll({ top: 0, left: 0, behavior: 'smooth' });
@@ -155,7 +162,7 @@ const Cozumon = ({ initialData }) => {
                       return (
                         <li key={c} className="w-32 mr-8 mt-1">
                           <label htmlFor={c} className="block cursor-pointer">
-                            <input type="radio" id={c} checked={selectedSpeciesClass === c} onChange={() => filterSpecies(c)} />{` `}{c.charAt(0).toUpperCase() + c.slice(1)}
+                            <input type="radio" id={c} checked={selectedSpeciesClass === c} onChange={() => filterSpecies(c)} />{` `}{capitalize(c)}
                           </label>
                         </li>
                       )
@@ -175,39 +182,40 @@ const Cozumon = ({ initialData }) => {
                 <Pagination />
 
                 {filtered &&
-                  <p><span className="font-bold">{filteredSpeciesCount}</span> species found in <span className="font-bold">{selectedSpeciesClass.charAt(0).toUpperCase() + selectedSpeciesClass.slice(1)}</span></p>
+                  <p><span className="font-bold">{filteredSpeciesCount}</span> species found in <span className="font-bold">{capitalize(selectedSpeciesClass)}</span></p>
                 }
                 {displayEndemic && !filtered &&
                   <p><span className="font-bold">{endemicSpeciesCount}</span> endemic species found</p>
                 }
 
                 {species.map(s => {
-                  const t = s.taxon
+
+                  const { id, name, preferred_common_name, iconic_taxon_name, conservation_status, extinct, default_photo, wikipedia_url } = s.taxon
                   return (
-                    <li key={t.id} className="bg-gray-50 shadow rounded p-6 my-6 flex space-x-6">
+                    <li key={id} className="bg-gray-50 shadow rounded p-6 my-6 flex space-x-6">
 
                       <div>
-                        {t.default_photo?.square_url ?
+                        {default_photo?.square_url ?
                           <Image
-                            src={t.default_photo.square_url}
+                            src={default_photo.square_url}
                             height={100}
                             width={100}
                           />
                           :
                           <div className="w-24 h-24 text-sm flex items-center justify-center">No image</div>
                         }
-                        <a href={t.wikipedia_url} target="_blank" className="block text-xs hover:text-brand">More information</a>
+                        {wikipedia_url &&
+                          <a href={wikipedia_url} target="_blank" className="block text-xs hover:text-brand">More information</a>
+                        }
                       </div>
 
                       <div className="text-sm">
-                        <h2 className="text-lg font-bold mb-4 text-brand">{t.preferred_common_name}</h2>
-                        <p>Taxonomy: {t.iconic_taxon_name}</p>
-                        <p>Latin: {t.name}</p>
+                        <h2 className="text-lg font-bold mb-4 text-brand">{preferred_common_name ? capitalize(preferred_common_name) : "No common name available"}</h2>
+                        <p>Latin Name: {name}</p>
+                        <p>Taxonomy: {iconic_taxon_name}</p>
                         <p>Number of observations: {s.count}</p>
-
-                        <p>Status: {t.conservation_status?.status_name ? getStatusName(t.conservation_status.status_name) : "no data"}</p>
-
-                        {t.extinct ? <p>Species has become extinct...</p> : ``}
+                        <p>Status: {conservation_status?.status_name ? getStatusName(conservation_status.status_name) : "no data"}</p>
+                        {extinct ? <p>Species has become extinct...</p> : ``}
                       </div>
                     </li>
                   )
