@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import HashLoader from "react-spinners/HashLoader"
 
 const Cozumon = ({ initialData }) => {
@@ -18,10 +18,17 @@ const Cozumon = ({ initialData }) => {
   const [filtered, setFilered] = useState(false)
   const [displayEndemic, setDisplayEndemic] = useState(false)
   const [endemicSpeciesCount, setEndemicSpeciesCount] = useState(0)
+  const [showToTop, setShowToTop] = useState(false)
 
   if (!species) {
     return <div><h2>Sorry, error fetching data.</h2></div>
   }
+
+  useEffect(() => {
+    document.addEventListener('scroll', function (e) {
+      window.scrollY > 800 ? setShowToTop(true) : setShowToTop(false)
+    })
+  })
 
   const fetchData = async (mode) => {
     setFetching(true)
@@ -211,11 +218,13 @@ const Cozumon = ({ initialData }) => {
             </>
           }
 
-          <a href="#" onClick={scrollToTop} className="fixed bottom-2 right-2 z-10 cursor-pointer border border-dotted p-2 hover:bg-brand hover:text-white transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 11l7-7 7 7M5 19l7-7 7 7" />
-            </svg>
-          </a>
+          {showToTop &&
+            <a href="#" onClick={scrollToTop} className="fixed bottom-2 right-2 z-10 cursor-pointer border border-dotted p-2 hover:bg-brand hover:text-white transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 11l7-7 7 7M5 19l7-7 7 7" />
+              </svg>
+            </a>
+          }
 
         </div>
 
