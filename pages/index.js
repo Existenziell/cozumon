@@ -140,7 +140,6 @@ const Cozumon = ({ initialData }) => {
                   <p>Filter per taxanomy class:</p>
                   <ul className="flex flex-wrap mt-2">
                     {speciesClasses.map((c) => {
-                      // console.log(selectedSpeciesClass);
                       return (
                         <li key={c} className="w-32 mr-8 mt-1">
                           <label htmlFor={c} className="block cursor-pointer">
