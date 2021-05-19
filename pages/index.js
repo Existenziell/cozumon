@@ -43,7 +43,7 @@ const Cozumon = ({ initialData }) => {
       <div className="w-full flex justify-between mt-4">
         <div className="w-1/3">
           {currentPage > 1 &&
-            <svg xmlns="http://www.w3.org/2000/svg" onClick={() => paginate(0)} className="h-10 w-10 text-gray-600 cursor-pointer hover:text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" onClick={() => paginate(0)} className="h-10 w-10 text-gray-600 cursor-pointer border border-dotted p-2 hover:bg-brand hover:text-white transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           }
@@ -51,7 +51,7 @@ const Cozumon = ({ initialData }) => {
         <p>Page {currentPage} / {totalPages}</p>
         <div className="w-1/3 flex justify-end">
           {currentPage < totalPages &&
-            <svg xmlns="http://www.w3.org/2000/svg" onClick={() => paginate(1)} className="h-10 w-10 text-gray-600 cursor-pointer hover:text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" onClick={() => paginate(1)} className="h-10 w-10 text-gray-600 cursor-pointer border border-dotted p-2 hover:bg-brand hover:text-white transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           }
@@ -103,6 +103,11 @@ const Cozumon = ({ initialData }) => {
     }
   }
 
+  const scrollToTop = (e) => {
+    e.preventDefault()
+    window.scroll({ top: 0, left: 0, behavior: 'smooth' });
+  }
+
   return (
     <>
       <Head>
@@ -112,11 +117,11 @@ const Cozumon = ({ initialData }) => {
       </Head>
 
       <main className="flex flex-col items-center px-16 w-screen">
-        <h1 className="text-4xl mt-4 mb-8 text-brand">Cozumel Taxonomy</h1>
+        <h1 className="text-4xl my-8 text-brand">Cozumel Taxonomy</h1>
 
         <div className="flex flex-col items-center w-full pb-16">
-          <h2 className="my-6 bg-gray-50 shadow p-6 text-center max-w-md">
-            The following list shows all animals and plants that have been observed on Cozumel and is ordered by the number of observations.
+          <h2 className="my-6 bg-gray-50 shadow p-6 text-center max-w-xl">
+            The following list shows all species that have been observed on Cozumel and is ordered by the number of these observations.
             <p className="text-xs mt-2">Total number of observed species: {totalAmount}</p>
           </h2>
 
@@ -205,6 +210,12 @@ const Cozumon = ({ initialData }) => {
               </ul>
             </>
           }
+
+          <a href="#" onClick={scrollToTop} className="fixed bottom-2 right-2 z-10 cursor-pointer border border-dotted p-2 hover:bg-brand hover:text-white transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 11l7-7 7 7M5 19l7-7 7 7" />
+            </svg>
+          </a>
 
         </div>
 
