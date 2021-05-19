@@ -2,6 +2,10 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import HashLoader from "react-spinners/HashLoader"
+import translateStatusName from '../lib/translateStatusName'
+import downloadCsv from '../lib/downloadCsv'
+import capitalize from '../lib/capitalize'
+import scrollToTop from '../lib/scrollToTop'
 
 const Cozumon = ({ initialData }) => {
 
@@ -97,31 +101,6 @@ const Cozumon = ({ initialData }) => {
     return setSpecies(filteredSpecies.results)
   }
 
-  const getStatusName = (name) => {
-    switch (name) {
-      case "amenazada":
-        return "threatened"
-      case "sujeta a protección especial":
-        return "subject to special protection"
-      case "en peligro de extinción":
-        return "in danger of extinction"
-      default:
-        return name
-    }
-  }
-
-  const capitalize = (string) => {
-    const cap = (str) => {
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-    return string.split(' ').map(cap).join(' ');
-  }
-
-  const scrollToTop = (e) => {
-    e.preventDefault()
-    window.scroll({ top: 0, left: 0, behavior: 'smooth' });
-  }
-
   return (
     <>
       <Head>
@@ -147,12 +126,21 @@ const Cozumon = ({ initialData }) => {
 
           {!fetching &&
             <>
-              <a href="#" onClick={() => setShowFilters(!showFilters)} className="flex items-center w-max hover:text-brand mb-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
-                <span>Filter</span>
-              </a>
+
+              <div className="flex justify-between w-full">
+                <a href="#" onClick={(e) => e.preventDefault() & setShowFilters(!showFilters)} className="flex items-center w-max hover:text-brand mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  </svg>
+                  <span>Filter</span>
+                </a>
+                <a href="#" onClick={(e) => downloadCsv(e, species)} className="flex items-center w-max hover:text-brand mb-2">
+                  <span>Download</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </a>
+              </div>
 
               {showFilters &&
                 <div className="border border-dashed p-6 mb-12">
@@ -182,10 +170,10 @@ const Cozumon = ({ initialData }) => {
                 <Pagination />
 
                 {filtered &&
-                  <p><span className="font-bold">{filteredSpeciesCount}</span> species found in <span className="font-bold">{capitalize(selectedSpeciesClass)}</span></p>
+                  <p><span className="font-bold">{filteredSpeciesCount}</span> species found in <span className="font-bold">{capitalize(selectedSpeciesClass)}</span>.</p>
                 }
                 {displayEndemic && !filtered &&
-                  <p><span className="font-bold">{endemicSpeciesCount}</span> endemic species found</p>
+                  <p><span className="font-bold">{endemicSpeciesCount}</span> endemic species found.</p>
                 }
 
                 {species.map(s => {
@@ -214,7 +202,7 @@ const Cozumon = ({ initialData }) => {
                         <p>Latin Name: {name}</p>
                         <p>Taxonomy: {iconic_taxon_name}</p>
                         <p>Number of observations: {s.count}</p>
-                        <p>Status: {conservation_status?.status_name ? getStatusName(conservation_status.status_name) : "no data"}</p>
+                        <p>Status: {conservation_status?.status_name ? translateStatusName(conservation_status.status_name) : "no data"}</p>
                         {extinct ? <p>Species has become extinct...</p> : ``}
                       </div>
                     </li>
