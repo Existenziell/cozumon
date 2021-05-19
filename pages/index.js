@@ -23,6 +23,7 @@ const Cozumon = ({ initialData }) => {
   const [displayEndemic, setDisplayEndemic] = useState(false)
   const [endemicSpeciesCount, setEndemicSpeciesCount] = useState(0)
   const [showToTop, setShowToTop] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   if (!species) {
     return <div><h2>Sorry, error fetching data.</h2></div>
@@ -32,6 +33,7 @@ const Cozumon = ({ initialData }) => {
     document.addEventListener('scroll', function (e) {
       window.scrollY > 800 ? setShowToTop(true) : setShowToTop(false)
     })
+    setLoading(false)
   })
 
   const fetchData = async (mode) => {
@@ -124,7 +126,7 @@ const Cozumon = ({ initialData }) => {
             </div>
           }
 
-          {!fetching &&
+          {!fetching && !loading &&
             <>
 
               <div className="flex justify-between w-full">
