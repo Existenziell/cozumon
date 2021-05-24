@@ -103,11 +103,6 @@ const Cozumon = ({ initialData }) => {
     return setSpecies(filteredSpecies.results)
   }
 
-  const download = async (species) => {
-    const encodedUri = await downloadCsv(species)
-    window.open(encodedUri)
-  }
-
   return (
     <>
       <Head>
@@ -141,7 +136,7 @@ const Cozumon = ({ initialData }) => {
                   </svg>
                   <span>Filter</span>
                 </a>
-                <a href="#" onClick={(e) => e.preventDefault() & download(species)} target="_blank" className="flex items-center w-max hover:text-brand mb-2">
+                <a href="#" onClick={(e) => e.preventDefault() & downloadCsv(species)} target="_blank" className="flex items-center w-max hover:text-brand mb-2">
                   <span>Download</span>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
