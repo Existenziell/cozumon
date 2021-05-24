@@ -20,10 +20,13 @@ const Cozumon = ({ initialData }) => {
   const [selectedSpeciesClass, setSelectedSpeciesClass] = useState("all")
   const [filteredSpeciesCount, setFilteredSpeciesCount] = useState(0)
   const [filtered, setFilered] = useState(false)
-  const [displayEndemic, setDisplayEndemic] = useState(false)
+  const [showEndemic, setShowEndemic] = useState(false)
   const [endemicSpeciesCount, setEndemicSpeciesCount] = useState(0)
-  const [showToTop, setShowToTop] = useState(false)
+  const [searched, setSearched] = useState(false)
+  const [searchedSpeciesCount, setSearchedSpeciesCount] = useState(0)
+  const [showScrollToTop, setShowScrollToTop] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
 
   if (!species) {
     return <div><h2>Sorry, error fetching data.</h2></div>
@@ -31,7 +34,7 @@ const Cozumon = ({ initialData }) => {
 
   useEffect(() => {
     document.addEventListener('scroll', function (e) {
-      window.scrollY > 800 ? setShowToTop(true) : setShowToTop(false)
+      window.scrollY > 800 ? setShowScrollToTop(true) : setShowScrollToTop(false)
     })
     setLoading(false)
   })
@@ -51,7 +54,7 @@ const Cozumon = ({ initialData }) => {
   }
 
   const Pagination = () => {
-    if (displayEndemic || filtered) return ``
+    if (showEndemic || filtered || searched) return ``
     return (
       <div className="w-full flex justify-between mt-4">
         <div className="w-1/3">
@@ -73,9 +76,9 @@ const Cozumon = ({ initialData }) => {
     )
   }
 
-  const showEndemic = async () => {
-    if (displayEndemic) {
-      setDisplayEndemic(false)
+  const showEndemicSpecies = async () => {
+    if (showEndemic) {
+      setShowEndemic(false)
       return setSpecies(allSpecies)
     } else {
       setFetching(true)
@@ -83,7 +86,7 @@ const Cozumon = ({ initialData }) => {
       const endemicSpecies = await req.json()
       setEndemicSpeciesCount(endemicSpecies.total_results)
       setFetching(false)
-      setDisplayEndemic(true)
+      setShowEndemic(true)
       return setSpecies(endemicSpecies.results)
     }
   }
@@ -97,10 +100,34 @@ const Cozumon = ({ initialData }) => {
     setFetching(true)
     const req = await fetch(`https://api.inaturalist.org/v1/observations/species_counts?place_id=37612&iconic_taxa=${identifier}`)
     const filteredSpecies = await req.json()
-    setFilteredSpeciesCount(filteredSpecies.total_results)
     setFilered(true)
+    setFilteredSpeciesCount(filteredSpecies.total_results)
     setFetching(false)
     return setSpecies(filteredSpecies.results)
+  }
+
+  const searchSpecies = async (e) => {
+    const form = document.forms[0]
+    if (form.checkValidity()) {
+      const searchterm = document.getElementById("searchterm").value
+      setSearchTerm(searchterm)
+      setFetching(true)
+      setShowFilters(false)
+      setShowEndemic(false)
+      const req = await fetch(`https://api.inaturalist.org/v1/observations/species_counts?place_id=37612&q=${searchterm}`)
+      const searchedSpecies = await req.json()
+      setSearched(true)
+      setSearchedSpeciesCount(searchedSpecies.total_results)
+      setFetching(false)
+      return setSpecies(searchedSpecies.results)
+    }
+  }
+
+  const resetSearch = () => {
+    setSearched(false)
+    setSearchTerm("")
+    setSearchedSpeciesCount(0)
+    setSpecies(allSpecies)
   }
 
   return (
@@ -129,13 +156,25 @@ const Cozumon = ({ initialData }) => {
           {!fetching && !loading &&
             <>
 
+              <form onSubmit={searchSpecies} className="flex items-center space-x-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input type="text" placeholder="Search" id="searchterm" required className="px-4 py-2 border border-dashed"></input>
+                <input type="submit" onClick={searchSpecies} className="cursor-pointer bg-white hover:text-brand" value="Go" />
+              </form>
+
               <div className="flex justify-between w-full">
-                <a href="#" onClick={(e) => e.preventDefault() & setShowFilters(!showFilters)} className="flex items-center w-max hover:text-brand mb-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                  </svg>
-                  <span>Filter</span>
-                </a>
+                {searched ?
+                  <div></div>
+                  :
+                  <a href="#" onClick={(e) => e.preventDefault() & setShowFilters(!showFilters)} className="flex items-center w-max hover:text-brand mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                    <span>Filter</span>
+                  </a>
+                }
                 <a href="#" onClick={(e) => e.preventDefault() & downloadCsv(species)} target="_blank" className="flex items-center w-max hover:text-brand mb-2">
                   <span>Download</span>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -161,7 +200,7 @@ const Cozumon = ({ initialData }) => {
                   </ul>
                   {selectedSpeciesClass === 'all' &&
                     <label htmlFor="endemic" className="mt-4 block cursor-pointer">
-                      <input type="checkbox" id="endemic" checked={displayEndemic} onChange={showEndemic} />{` `}Show only endemic species
+                      <input type="checkbox" id="endemic" checked={showEndemic} onChange={showEndemicSpecies} />{` `}Show only endemic species
                     </label>
                   }
                 </div>
@@ -174,15 +213,29 @@ const Cozumon = ({ initialData }) => {
                 {filtered &&
                   <p><span className="font-bold">{filteredSpeciesCount}</span> species found in <span className="font-bold">{capitalize(selectedSpeciesClass)}</span>.</p>
                 }
-                {displayEndemic && !filtered &&
+                {showEndemic && !filtered &&
                   <p><span className="font-bold">{endemicSpeciesCount}</span> endemic species found.</p>
                 }
 
-                {species.map(s => {
+                {searched &&
+                  <div className="flex items-center">
+                    <p>
+                      <span className="font-bold">{searchedSpeciesCount}</span> species found for search '{searchTerm}'
+                    </p>
+                    <div onClick={resetSearch} className="ml-6 flex space-x-1 items-center border border-brand px-2 py-1 cursor-pointer hover:bg-brand hover:text-white transition-all">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      <span className="text-sm">Reset</span>
+                    </div>
+                  </div>
+                }
 
+                {species.map(s => {
                   const { id, name, preferred_common_name, iconic_taxon_name, conservation_status, extinct, default_photo, wikipedia_url } = s.taxon
+
                   return (
-                    <li key={id} className="bg-gray-50 shadow rounded p-6 my-6 flex space-x-6">
+                    <li key={id + name + preferred_common_name} className="bg-gray-50 shadow rounded p-6 my-6 flex space-x-6">
 
                       <div>
                         {default_photo?.square_url ?
@@ -216,7 +269,7 @@ const Cozumon = ({ initialData }) => {
             </>
           }
 
-          {showToTop &&
+          {showScrollToTop &&
             <a href="#" onClick={scrollToTop} className="fixed bottom-2 right-2 z-10 cursor-pointer border border-dotted p-2 hover:bg-brand hover:text-white transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 11l7-7 7 7M5 19l7-7 7 7" />
