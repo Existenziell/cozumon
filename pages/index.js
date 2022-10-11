@@ -156,7 +156,7 @@ const Cozumon = ({ initialData }) => {
 
           {fetching &&
             <div className="mt-16">
-              <HashLoader color={"#556B2F"} loading={fetching} size={50} />
+              <HashLoader color={"#207068"} loading={fetching} size={50} />
             </div>
           }
 

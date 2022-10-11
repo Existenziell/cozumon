@@ -26,7 +26,7 @@ const Species = () => {
   if (!species) {
     return (
       <div className="mt-32 flex justify-center">
-        <HashLoader color={"#556B2F"} size={100} />
+        <HashLoader color={"#207068"} size={100} />
       </div>
     )
   }
