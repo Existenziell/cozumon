@@ -35,7 +35,6 @@ const Species = () => {
 
   return (
     <>
-
       <Head>
         <title>Cozumon</title>
         <meta name="description" content="Cozumon | Cozumel Taxonomy" />
