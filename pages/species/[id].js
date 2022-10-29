@@ -1,75 +1,65 @@
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react';
+import { useQuery } from 'react-query'
+import { SyncLoader } from 'react-spinners'
 import Head from 'next/head'
 import Image from 'next/image'
-import Link from 'next/link'
 import translateStatusName from '../../lib/translateStatusName'
-import HashLoader from "react-spinners/HashLoader"
+import BackBtn from '../../components/BackBtn'
+import fetchApi from '../../lib/fetchApi'
 
 const Species = () => {
-
   const router = useRouter()
-  const identifier = router.query.id
-  const [species, setSpecies] = useState()
+  const { id } = router.query
 
-  const fetchSpecies = async (identifier) => {
-    const url = `https://api.inaturalist.org/v1/taxa/${identifier}`
-    const res = await fetch(url)
-    const species = await res.json()
-    setSpecies(species.results[0].taxon_photos[0])
-  }
+  const { status, data } = useQuery(["species", id], () =>
+    fetchApi(`https://api.inaturalist.org/v1/taxa/${id}`),
+  )
 
-  useEffect(() => {
-    if (identifier) fetchSpecies(identifier)
-  }, [identifier]);
+  if (status === "error") return <p>{status}</p>
+  if (status === 'loading') return <div className='mx-auto w-max mt-16'><SyncLoader size={10} color='var(--color-cta)' /></div>
 
-  if (!species) {
-    return (
-      <div className="mt-32 flex justify-center">
-        <HashLoader color={"#207068"} size={100} />
-      </div>
-    )
-  }
-
-  const { id, name, preferred_common_name, iconic_taxon_name, observations_count, extinct, wikipedia_url } = species.taxon
+  const { name, preferred_common_name, iconic_taxon_name, observations_count, conservation_status, taxon_photos, extinct, wikipedia_url, wikipedia_summary } = data.results.at(0)
 
   return (
     <>
       <Head>
-        <title>Cozumon</title>
-        <meta name="description" content="Cozumon | Cozumel Taxonomy" />
+        <title>{`${name} | Cozumon | Cozumel Taxonomy`}</title>
+        <meta name="description" content={`${name} | Cozumon | Cozumel Taxonomy`} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col items-center px-16 w-screen">
+      <div className="flex flex-col items-center px-16 w-full">
+        <BackBtn href='/' />
 
+        <h1 className="text-4xl mb-8">{preferred_common_name}</h1>
 
-        <Link href="/"><a className="absolute left-4 top-8  border border-dotted p-2 hover:bg-brand hover:text-white transition-all">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </a></Link>
-
-        <h1 className="text-4xl my-8 text-brand">{preferred_common_name}</h1>
-
-        <div className="flex flex-col items-center w-full pb-16">
-          <div className="shadow border border-dotted px-8 py-4 mb-8">
+        <div className="flex flex-col items-center w-full">
+          <div className="mb-8 max-w-max">
             <p>Latin Name: {name}</p>
             <p>Taxonomy: {iconic_taxon_name}</p>
             <p>Number of observations: {observations_count}</p>
-            {/* <p>Status: {conservation_status?.status_name ? translateStatusName(conservation_status.status_name) : "no data"}</p> */}
+            <p>Status: {conservation_status?.status_name ? translateStatusName(conservation_status.status_name) : "No data"}</p>
             {extinct ? <p>Species has become extinct...</p> : ``}
-            <a href={wikipedia_url} target="_blank" className="mt-4 text-sm block">More information</a>
           </div>
 
-          <Image
-            src={species.photo.large_url}
-            width={species.photo.original_dimensions.width}
-            height={species.photo.original_dimensions.height}
-          />
+          <span dangerouslySetInnerHTML={{ __html: wikipedia_summary }} className='text-center' />
+          {wikipedia_url &&
+            <a href={wikipedia_url} target="_blank" rel="noopener noreferrer nofollow" className="link inline-block text-xs mt-2 mb-8">More information</a>
+          }
+
+          <div className='nextimg shadow-lg'>
+            <Image
+              src={taxon_photos.at(0).photo.large_url}
+              width={taxon_photos.at(0).photo.original_dimensions.width}
+              height={taxon_photos.at(0).photo.original_dimensions.height}
+              placeholder='blur'
+              alt={iconic_taxon_name}
+              blurDataURL={taxon_photos.at(0).photo.large_url}
+              className='rounded'
+            />
+          </div>
         </div>
-      </main>
-      {/* <pre>{JSON.stringify(species, null, 2)}</pre> */}
+      </div>
     </>
   )
 }

@@ -1,6 +1,8 @@
 module.exports = {
-  future: {
-    webpack5: true,
+  reactStrictMode: true,
+  i18n: {
+    locales: ['en'],
+    defaultLocale: 'en',
   },
   images: {
     domains: [
